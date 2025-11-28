@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:7
     container_name: eventplanner-mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27017"  # Changed to avoid conflict
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -19,7 +17,7 @@ services:
     container_name: eventplanner-backend
     restart: always
     ports:
-      - "5000:5000"
+      - "5001:5000"  # Changed to 5001 externally, 5000 internally
     environment:
       - MONGO_URI=mongodb://mongodb:27017/eventplanner
       - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
@@ -36,7 +34,7 @@ services:
     container_name: eventplanner-frontend
     restart: always
     ports:
-      - "3000:80"
+      - "3001:80"  # Changed to 3001 to avoid conflict with local React
     depends_on:
       - backend
     networks:
