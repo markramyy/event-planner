@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: eventplanner-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - eventplanner-network
+
+  backend:
+    build:
+      context: ./eventplanner-backend
+      dockerfile: Dockerfile
+    container_name: eventplanner-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/eventplanner
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+      - FLASK_ENV=production
+    depends_on:
+      - mongodb
+    networks:
+      - eventplanner-network
+
+  frontend:
+    build:
+      context: ./eventplanner-frontend
+      dockerfile: Dockerfile
+    container_name: eventplanner-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - eventplanner-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  eventplanner-network:
+    driver: bridge
